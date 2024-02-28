@@ -18,7 +18,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = \
 
 db = SQLAlchemy(app)
 
-
+# 전적 기록 DB 생성
 class Record(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_card = db.Column(db.String, nullable=False)
@@ -33,25 +33,36 @@ with app.app_context():
     db.create_all()
 
 
+# main
 @app.route('/')
 def main():
+
+    # 전적 기록 목록 DB에서 가져오기
     record_list = Record.query.order_by(Record.id.desc()).all()
     print(record_list)
 
+    # 승리 수 가져오기
     win_count = Record.query.filter_by(game_result="승").count()
+    # 패배 수 가져오기
     lost_count = Record.query.filter_by(game_result="패").count()
+    # 무승부 수 가져오기
     draw_count = Record.query.filter_by(game_result="무").count()
 
     return render_template('index.html',data=record_list,win_count=win_count,lost_count=lost_count
                            ,draw_count=draw_count)
 
 
+# 가위바위보 선택시 호출 함수
 @app.route('/selectCard', methods=['POST'])
 def select_card():
+
+    # 유저 선택 값 가져오기
     user_card = request.form.get("user_card")
+    # 랜덤 선택 값 가져오기
     computer_card = request.form.get("computer_card")
     game_result = ""
 
+    # 가위 바위 보 승패 조건문
     if user_card == computer_card:
         game_result = "무"
     else:
@@ -71,6 +82,7 @@ def select_card():
             else:
                 game_result = "패"
 
+    # 전적 DB에 추가하기
     record = Record(user_card=user_card, computer_card=computer_card, game_result=game_result)
     db.session.add(record)
     db.session.commit()
