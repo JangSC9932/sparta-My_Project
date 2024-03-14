@@ -2,8 +2,8 @@ from collections import deque
 t = int(input())
 
 # deque 사용시
-t_deque_list = deque([i for i in range(1, t+1)])
-
+t_deque_list = deque(i for i in range(1, t+1))
+print(t_deque_list)
 while len(t_deque_list) > 1:
     print(f"카드 목록 : {list(t_deque_list)}")
     # 카드 삭제
